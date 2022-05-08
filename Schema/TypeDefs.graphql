@@ -1,0 +1,190 @@
+scalar Date
+
+type PriceCard {
+  _id: ID!
+  name: String!
+  status: Boolean!
+  tickets: [Ticket]
+}
+
+type Ticket {
+  _id: ID!
+  name: String!
+  description: String
+  isChild: Boolean!
+}
+input TicketIn {
+  _id: ID!
+}
+
+type Cinema {
+  _id: ID!
+  name: String!
+  screens: [Screen!]
+}
+input EditCinemaIn {
+  name: String
+}
+
+type Screen {
+  _id: ID!
+  number: Int!
+  name: String!
+}
+input ScreenIn {
+  "Please screen of id add value"
+  _id: ID!
+}
+
+type Censor {
+  _id: ID!
+  rating: String!
+  description: String
+}
+
+input CensorIn {
+  _id: ID
+}
+input CensorUpdateInput {
+  rating: String
+  description: String
+}
+
+type Format {
+  _id: String!
+  type: String!
+}
+input FormatIn {
+  _id: ID
+}
+
+type Genre {
+  _id: ID!
+  name: String!
+}
+
+input GenreIn {
+  _id: ID
+}
+
+"Movie type"
+type Movie {
+  """
+  Movie _id field
+  """
+  _id: ID!
+  title: String!
+  synopsis: String!
+  release_date: Date!
+  runtime: Int!
+  genres: [Genre!]
+  format: [Format!]
+  censor: Censor
+}
+input MovieCreateInput {
+  title: String!
+  synopsis: String!
+  release_date: String!
+  runtime: Int!
+  genres: [GenreIn]
+  format: [FormatIn]
+  censor: CensorIn
+}
+input MovieUpdateInput {
+  title: String
+  synopsis: String
+  release_date: Date
+  runtime: Int
+  genres: [GenreIn]
+  format: [FormatIn]
+  censor: CensorIn
+}
+### This must be!!
+type UpdateMovieMutationResponse implements MutationResponse {
+  status: String!
+  message: String
+  data: [Movie]!
+}
+
+# Queries
+type Query {
+  getPriceCards: [PriceCard!]!
+  getTickets: [Ticket!]!
+  getScreens: [Screen!]!
+  getCinemas: [Cinema!]!
+  getCensors: [Censor!]!
+  getGenres: [Genre!]!
+  getFormat: [Format!]!
+
+  "All of movies data"
+  getMovies: [Movie!]!
+  movieDetail(_id: ID!): [Movie]
+}
+
+# Mutations
+type Mutation {
+  createPriceCard(name: String!, status: Boolean!): PriceCard
+  addTicketToPriceCard(_id: ID!, dataTicket: TicketIn): PriceCard
+  removeTicketFromPriceCard(_id: ID!, dataTicket: TicketIn): PriceCard
+
+  createTicket(name: String!, description: String!, isChild: Boolean!): Ticket!
+  deleteTicket(_id: ID!): Ticket!
+
+  updateCinema(_id: ID!, data: EditCinemaIn!): Cinema!
+
+  addScreenToCinema(_id: ID!, data: ScreenIn): addScreenToCinemaResponse!
+  createScreen(number: Int!, name: String!): Screen!
+  createCensor(rating: String!, description: String): Censor!
+  updateCensor(_id: ID, data: CensorUpdateInput): Censor!
+  deleteCensor(_id: ID): Censor!
+
+  createGenre(name: String!): Genre!
+  updateGenre(_id: ID!, name: String): Genre!
+  deleteGenre(_id: ID!): Genre!
+
+  createFormat(type: String!): Format!
+  deleteFormat(_id: ID!): Format!
+
+  createMovie(data: MovieCreateInput): Movie!
+
+  updateMovie(_id: ID!, data: MovieUpdateInput): UpdateMovieMutationResponse
+
+  deleteMovie(_id: ID!): Movie!
+}
+
+type addScreenToCinemaResponse {
+  "Similar to HTTP status code, represents the status of the mutation"
+  code: Int!
+  "Indicates whether the mutation was successful"
+  success: Boolean!
+  "Human-readable message for the UI"
+  message: String!
+  "Newly updated track after a successful mutation"
+  cinema: Cinema
+}
+
+# Interface
+interface MutationResponse {
+  status: String!
+  message: String
+}
+
+"""
+interface MutationResponse {
+  "Similar to HTTP status code, represents the status of the mutation"
+  code: Int!
+  "Indicates whether the mutation was successful"
+  success: Boolean!
+  "Human-readable message for the UI"
+  message: String!
+}
+"""
+
+# Enum
+enum AttributeType {
+  ATMOS
+  IMAX
+  LASER
+  VIP
+  PREMIUM
+}
